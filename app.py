@@ -5,7 +5,9 @@ from werkzeug.utils import secure_filename, redirect
 import PyPDF2
 import pyttsx3
 speaker = pyttsx3.init()
-
+from gtts import gTTS
+import os
+from playsound import playsound
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -30,21 +32,20 @@ def upload_files():
 
 def audio(file):
     pdfReader = PyPDF2.PdfFileReader(open('uploads/{}'.format(file), 'rb'))
-    text = pdfReader.getPage(25).extractText()
+    text = pdfReader.getPage(76).extractText()
     title=pdfReader.getDocumentInfo()
 
     # title of the pdf here///
     print(title['/Title'])
 
-    engine = pyttsx3.init()
-    voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[0].id)
-    engine.say(title['/Title'])
-    engine.runAndWait()
-    speaker.setProperty('voice', voices[1].id)
-    speaker.say(text)
-    speaker.runAndWait()
 
+    tts = gTTS(text=title['/Title'], lang='it')
+    tts.save("title.mp3")
+    playsound("title.mp3")
+
+    sst=gTTS(text=text,lang='en')
+    sst.save("content.mp3")
+    playsound("content.mp3")
 
 
 if __name__ == '__main__':
