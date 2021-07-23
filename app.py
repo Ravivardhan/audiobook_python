@@ -32,8 +32,8 @@ def upload_files():
 
 def audio(file):
     pdfReader = PyPDF2.PdfFileReader(open('uploads/{}'.format(file), 'rb'))
-    text = pdfReader.getPage(76).extractText()
     title=pdfReader.getDocumentInfo()
+    text=""
 
     # title of the pdf here///
     print(title['/Title'])
@@ -43,9 +43,21 @@ def audio(file):
     tts.save("title.mp3")
     playsound("title.mp3")
 
-    sst=gTTS(text=text,lang='en')
-    sst.save("content.mp3")
-    playsound("content.mp3")
+    for page_num in range(pdfReader.numPages):
+        text += pdfReader.getPage(page_num).extractText()
+
+    speaker.say(text)
+    print(text)
+    speaker.runAndWait()
+    speaker.stop()
+    #speaker.save_to_file(text,'audiobook.mp3')
+
+
+
+
+    #sst=gTTS(text=text,lang='en')
+    #sst.save("content.mp3")
+    #playsound("audiobook.mp3")
 
 
 if __name__ == '__main__':
