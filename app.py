@@ -1,17 +1,21 @@
 import imghdr
 import os
+
+import flask
+
 from flask import Flask, render_template, request, flash
 from werkzeug.utils import secure_filename, redirect
 import PyPDF2
 import pyttsx3
 speaker = pyttsx3.init()
+
 from gtts import gTTS
 import os
 from playsound import playsound
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
+app.secret_key='audiobook'
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -32,16 +36,16 @@ def upload_files():
 
 def audio(file):
     pdfReader = PyPDF2.PdfFileReader(open('uploads/{}'.format(file), 'rb'))
-    title=pdfReader.getDocumentInfo()
-    text=""
+    #title=pdfReader.getDocumentInfo()
+    #text=""
 
     # title of the pdf here///
-    print(title['/Title'])
+    #print(title['/Title'])
 
 
-    tts = gTTS(text=title['/Title'], lang='it')
-    tts.save("title.mp3")
-    playsound("title.mp3")
+    #tts = gTTS(text=title['/Title'], lang='it')
+    #tts.save("title.mp3")
+    #playsound("title.mp3")
     mytext=""
     for page_num in range(1,pdfReader.numPages):
         pageObj=pdfReader.getPage(page_num)
@@ -63,7 +67,33 @@ def audio(file):
     #sst.save("content.mp3")
     #playsound("audiobook.mp3")
 
+@app.route('/notes',methods=['POST','GET'])
+def notes():
+        print(request.method)
+        if request.method=='POST':
+            print("nothinh")
+            text=request.form.get('addnote')
+            print(text)
+            file=open('notes/mynotes.txt','a')
+            file.write('\n'+text)
+        return render_template('audiobook.htmml')
 
+
+@app.route("/test", methods=["POST", "GET"])
+def home():
+    if request.method == "POST":
+        todo = request.form.get("todo")
+        file=open('notes/mynotes.txt','a')
+        #date timestamp
+        from datetime import datetime
+
+        now = datetime.now()
+
+        current_time = now.strftime("%H:%M:%S")
+        file.write('\n'+current_time)
+        file.write('\n'+todo)
+        file.close()
+    return render_template('audiobook.html')
 
 
 if __name__ == '__main__':
