@@ -64,6 +64,7 @@ def audio(file):
 
 
 
+    tts = gTTS(text=title, lang='it')
     tts.save("title.mp3")
     mytext=""
     for page_num in range(1,pdfReader.numPages):
