@@ -10,6 +10,11 @@
 </head>
 <body>
 <style>
+audio{
+    align-items:center;
+    text-align:center;
+    margin-left:30%;
+}
     .form-group{
         margin-top:10%;
         margin-left:10%;
@@ -25,17 +30,24 @@
 
   <div class="form-group">
 <audio controls autoplay>
-  <source src="good.mp3" type="audio/mpeg">
+  <source src="ab.mp3" type="audio/mpeg">
 
 </audio>
-    <label for="exampleFormControlTextarea1">Add Notes</label>
+      <form method="POST" action="{{url_for('notes')}}">
+    <h2 for="exampleFormControlTextarea1">Add Notes</h2>
     <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
       <button type="button" class="btn btn-primary">Cancel</button>
-<button type="button" class="btn btn-primary">Save</button>
+<button type="submit" class="btn btn-primary">Save</button>
 
-
+</form>
   </div>
 </form>
 
 </body>
+
+<?php
+$fp = fopen('ind.txt', 'w');
+fwrite($fp, 'Cats chase mice');
+fclose($fp);
+?>
 </html>

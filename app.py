@@ -42,15 +42,19 @@ def audio(file):
     tts = gTTS(text=title['/Title'], lang='it')
     tts.save("title.mp3")
     playsound("title.mp3")
+    mytext=""
+    for page_num in range(1,pdfReader.numPages):
+        pageObj=pdfReader.getPage(page_num)
+        mytext+=pageObj.extractText()+'\n'
+    print(mytext)
 
-    for page_num in range(pdfReader.numPages):
-        text += pdfReader.getPage(page_num).extractText()
-
-    speaker.say(text)
-    print(text)
-    speaker.runAndWait()
-    speaker.stop()
+    text=mytext
+    myobj=gTTS(text=text,lang='en',slow=False)
+    myobj.save('static/ab.mp3')
+    #tts=gTTS(text=mytext,lang='en')
+    #tts.save('story.mp3')
     #speaker.save_to_file(text,'audiobook.mp3')
+    return render_template('audiobook.html')
 
 
 
@@ -58,6 +62,8 @@ def audio(file):
     #sst=gTTS(text=text,lang='en')
     #sst.save("content.mp3")
     #playsound("audiobook.mp3")
+
+
 
 
 if __name__ == '__main__':
