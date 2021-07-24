@@ -3,12 +3,12 @@ import os
 
 import flask
 
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, url_for
 from werkzeug.utils import secure_filename, redirect
 import PyPDF2
 import pyttsx3
 speaker = pyttsx3.init()
-
+import pyrebase
 from gtts import gTTS
 import os
 from playsound import playsound
@@ -16,6 +16,21 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key='audiobook'
+
+firebaseConfig = {
+    'apiKey': "AIzaSyDKdjZCX083VYr4a1cb7pIhWiRvOrJkFwo",
+    'authDomain': "audiobook-68661.firebaseapp.com",
+    'projectId': "audiobook-68661",
+    'storageBucket': "audiobook-68661.appspot.com",
+    'messagingSenderId': "915447668878",
+    'appId': "1:915447668878:web:536efc64c13b5fc6d9a9df",
+    'measurementId': "G-8943FX49PW",
+    'databaseURL':"https://audiobook-68661-default-rtdb.firebaseio.com/"
+  }
+
+firebase=pyrebase.initialize_app(firebaseConfig)
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -36,16 +51,21 @@ def upload_files():
 
 def audio(file):
     pdfReader = PyPDF2.PdfFileReader(open('uploads/{}'.format(file), 'rb'))
-    #title=pdfReader.getDocumentInfo()
-    #text=""
+    title=pdfReader.getDocumentInfo()
+    text=""
+    print(title)
+    if '/Title' not in title:
+        title="this document does not contain any title"
 
     # title of the pdf here///
-    #print(title['/Title'])
+    else:
+        title=title['/Title']
 
 
-    #tts = gTTS(text=title['/Title'], lang='it')
-    #tts.save("title.mp3")
-    #playsound("title.mp3")
+
+
+    tts = gTTS(text=title, lang='it')
+    tts.save("title.mp3")
     mytext=""
     for page_num in range(1,pdfReader.numPages):
         pageObj=pdfReader.getPage(page_num)
@@ -55,6 +75,8 @@ def audio(file):
     text=mytext
     myobj=gTTS(text=text,lang='en',slow=False)
     myobj.save('static/ab.mp3')
+    playsound("title.mp3")
+
     #tts=gTTS(text=mytext,lang='en')
     #tts.save('story.mp3')
     #speaker.save_to_file(text,'audiobook.mp3')
@@ -94,6 +116,11 @@ def home():
         file.write('\n'+todo)
         file.close()
     return render_template('audiobook.html')
+@app.route('/file',methods=["POST","GET"])
+def file():
+    f = open('notes/mynotes.txt', "r")
+    sample = f.read()
+    return render_template("file.html", text=sample)
 
 
 if __name__ == '__main__':
