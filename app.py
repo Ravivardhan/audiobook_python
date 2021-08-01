@@ -1,7 +1,9 @@
 import imghdr
 import os
 
+import convertapi
 import flask
+import requests
 
 from flask import Flask, render_template, request, flash, url_for
 from werkzeug.utils import secure_filename, redirect
@@ -67,9 +69,19 @@ def audio(file):
     tts = gTTS(text=title, lang='it')
     tts.save("title.mp3")
     mytext=""
-    for page_num in range(1,pdfReader.numPages):
-        pageObj=pdfReader.getPage(page_num)
-        mytext+=pageObj.extractText()+'\n'
+    #for page_num in range(1,pdfReader.numPages):
+     #   pageObj=pdfReader.getPage(page_num)
+      #  mytext+=pageObj.extractText()+'\n'
+    #api
+
+    convertapi.api_secret = 'iw7Ryzu4trL8gA3x'
+    result = convertapi.convert('txt', {
+        'File': 'uploads/{}'.format(file)
+    }, from_format='pdf')
+    url = (result.file.info['Url'])
+    res = requests.get(url)
+    print(res.text)
+    mytext=res.text
     print(mytext)
     if mytext=="":
         mytext="""<!DOCTYPE html>
