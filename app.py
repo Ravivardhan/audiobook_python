@@ -5,7 +5,7 @@ import flask
 
 from flask import Flask, render_template, request, flash, url_for
 from werkzeug.utils import secure_filename, redirect
-import PyPDF2
+import PyPDF4 as PyPDF2
 import pyttsx3
 speaker = pyttsx3.init()
 import pyrebase
@@ -71,7 +71,21 @@ def audio(file):
         pageObj=pdfReader.getPage(page_num)
         mytext+=pageObj.extractText()+'\n'
     print(mytext)
-
+    if mytext=="":
+        mytext="""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cannot parse</title>
+</head>
+<body>
+    <h1>No text found try another one!!!</h1>
+    
+</body>
+</html>"""
+        return mytext
     text=mytext
     myobj=gTTS(text=text,lang='en',slow=False)
     myobj.save('static/ab.mp3')
